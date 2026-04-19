@@ -1,6 +1,6 @@
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
-import { EditorState, type Extension } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import { EditorView, drawSelection, keymap } from "@codemirror/view";
 
 import { mutedMarkdown } from "./muted-markdown";
@@ -15,7 +15,6 @@ export function createEditor(
   parent: HTMLElement,
   initial: string,
   onChange: (doc: string) => void,
-  appKeymap: Extension,
 ): EditorHandle {
   const state = EditorState.create({
     doc: initial,
@@ -26,7 +25,6 @@ export function createEditor(
       EditorState.tabSize.of(2),
       markdown({ base: markdownLanguage, codeLanguages: [] }),
       mutedMarkdown,
-      appKeymap,
       keymap.of([...defaultKeymap, ...historyKeymap]),
       EditorView.updateListener.of((u) => {
         if (u.docChanged) onChange(u.state.doc.toString());

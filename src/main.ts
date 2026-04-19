@@ -1,10 +1,10 @@
-import { keymap, type KeyBinding } from "@codemirror/view";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow, LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
 import { getMatches } from "@tauri-apps/plugin-cli";
 import { confirm, open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 
 import { createEditor, type EditorHandle } from "./editor";
+import { createPreview, type PreviewHandle } from "./preview";
 
 interface PersistedState {
   font_size?: number;
@@ -29,6 +29,7 @@ const docState: DocState = {
 };
 
 let editor: EditorHandle;
+let preview: PreviewHandle;
 let saveStateTimer: number | undefined;
 
 function hash(s: string): number {
@@ -77,10 +78,12 @@ function updateStatus(contents: string) {
   const nameEl = document.getElementById("status-name")!;
   const dirtyEl = document.getElementById("status-dirty")!;
   const wordsEl = document.getElementById("status-words")!;
+  const modeEl = document.getElementById("status-mode")!;
   nameEl.textContent = name;
   dirtyEl.dataset.dirty = String(isDirty());
   const words = contents.trim() ? contents.trim().split(/\s+/).length : 0;
   wordsEl.textContent = `${words} ${words === 1 ? "word" : "words"}`;
+  modeEl.textContent = preview?.isOpen() ? "preview" : "";
 }
 
 function onDocChange(contents: string) {
@@ -169,26 +172,38 @@ async function quit() {
   await getCurrentWindow().close();
 }
 
-function appKeymap() {
-  const binding = (key: string, run: () => void): KeyBinding => ({
-    key,
-    preventDefault: true,
-    run: () => {
-      run();
-      return true;
+function togglePreview() {
+  preview.toggle(editor.getDoc());
+  updateStatus(editor.getDoc());
+}
+
+function installKeybindings() {
+  const mac = navigator.platform.toLowerCase().includes("mac");
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      const mod = mac ? e.metaKey : e.ctrlKey;
+      if (!mod || e.altKey) return;
+      const key = e.key.toLowerCase();
+      const shift = e.shiftKey;
+      let handled = true;
+      if (key === "s" && !shift) void save();
+      else if (key === "s" && shift) void saveAs();
+      else if (key === "o" && !shift) void openViaDialog();
+      else if (key === "n" && !shift) void newFile();
+      else if (key === "q" && !shift) void quit();
+      else if (key === "e" && !shift) togglePreview();
+      else if (key === "=" || key === "+") bumpFontSize(1);
+      else if (key === "-") bumpFontSize(-1);
+      else if (key === "0") resetFontSize();
+      else handled = false;
+      if (handled) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     },
-  });
-  return keymap.of([
-    binding("Mod-s", () => void save()),
-    binding("Mod-Shift-s", () => void saveAs()),
-    binding("Mod-o", () => void openViaDialog()),
-    binding("Mod-n", () => void newFile()),
-    binding("Mod-q", () => void quit()),
-    binding("Mod-=", () => bumpFontSize(1)),
-    binding("Mod-+", () => bumpFontSize(1)),
-    binding("Mod--", () => bumpFontSize(-1)),
-    binding("Mod-0", () => resetFontSize()),
-  ]);
+    { capture: true },
+  );
 }
 
 function schedulePersist() {
@@ -246,9 +261,13 @@ async function boot() {
 
   applyFontSize(persisted.font_size ?? FONT_DEFAULT);
 
-  const root = document.getElementById("editor-root")!;
-  editor = createEditor(root, "", onDocChange, appKeymap());
+  const editorRoot = document.getElementById("editor-root")!;
+  const previewRoot = document.getElementById("preview-root")!;
 
+  editor = createEditor(editorRoot, "", onDocChange);
+  preview = createPreview(previewRoot, () => editor.view.focus());
+
+  installKeybindings();
   await installWindowPersistence();
 
   let openedFromArg = false;
