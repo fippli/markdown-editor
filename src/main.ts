@@ -1,3 +1,5 @@
+import "katex/dist/katex.min.css";
+
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow, LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
 import { getMatches } from "@tauri-apps/plugin-cli";

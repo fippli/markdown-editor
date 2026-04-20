@@ -77,7 +77,7 @@ Dark theme is explicitly out of scope — not in v1, not in the roadmap. Single-
 
 A single key toggles between them (`Ctrl+E` tentative). No split view in v1.
 
-Preview mode uses a proportional body font (system serif or a curated serif like Source Serif) for prose, keeping the monospace face only for inline `code` and code blocks — this mirrors iA Writer's preview treatment and makes the toggle feel meaningful.
+Preview mode uses **Inter** (bundled, SIL OFL) for headings and **Charter** (bundled, Bitstream → X Consortium permissive license) for body prose, with Hasklig kept for inline `code` and code blocks. Charter was chosen as the closest screen-optimized open substitute for Georgia (same designer as Georgia: Matthew Carter).
 
 ### Window
 
