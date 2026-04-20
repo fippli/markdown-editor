@@ -27,6 +27,7 @@ interface DocState {
 const FONT_MIN = 12;
 const FONT_MAX = 28;
 const FONT_DEFAULT = 16;
+const UNTITLED_NAME = "untitled.md";
 
 const persisted: PersistedState = {};
 const docState: DocState = {
@@ -74,7 +75,7 @@ function resetFontSize() {
 }
 
 function updateTitle() {
-  const name = docState.path ? basename(docState.path) : "Untitled";
+  const name = docState.path ? basename(docState.path) : UNTITLED_NAME;
   const mark = isDirty() ? " •" : "";
   const label = `${name}${mark} — Markdown`;
   document.title = label;
@@ -82,7 +83,7 @@ function updateTitle() {
 }
 
 function updateStatus(contents: string) {
-  const name = docState.path ? basename(docState.path) : "Untitled";
+  const name = docState.path ? basename(docState.path) : UNTITLED_NAME;
   const nameEl = document.getElementById("status-name")!;
   const dirtyEl = document.getElementById("status-dirty")!;
   const wordsEl = document.getElementById("status-words")!;
@@ -152,7 +153,7 @@ async function save(): Promise<boolean> {
 async function saveAs(): Promise<boolean> {
   const path = await saveDialog({
     filters: [{ name: "Markdown", extensions: ["md", "markdown"] }],
-    defaultPath: docState.path ?? "untitled.md",
+    defaultPath: docState.path ?? UNTITLED_NAME,
   });
   if (!path) return false;
   docState.path = path;
