@@ -50,8 +50,27 @@
       "icons/128x128@2x.png",
       "icons/icon.png"
     ],
-    "category": "Office",
+    "category": "Productivity",
     "shortDescription": "Markdown editor",
-    "longDescription": "A beautiful, keyboard-driven markdown editor for Linux."
+    "longDescription": "A beautiful, keyboard-driven markdown editor for Linux. Bundled Hasklig, Charter, and Inter fonts; math via KaTeX; diagrams via Mermaid.",
+    "fileAssociations": [
+      {
+        "ext": ["md", "markdown", "mdown", "mkd"],
+        "name": "Markdown Document",
+        "description": "Markdown document",
+        "mimeType": "text/markdown",
+        "role": "Editor"
+      }
+    ],
+    "linux": {
+      "deb": {
+        "section": "editors",
+        "priority": "optional",
+        "desktopTemplate": "main.desktop"
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
   }
 }
