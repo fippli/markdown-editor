@@ -12,6 +12,7 @@ import { exportHtml, exportPdf } from "./export";
 import { focusModeEnabled, toggleFocusMode } from "./focus-mode";
 import { installMenuBar, type MenuDef } from "./menu";
 import { createPreview, type PreviewHandle } from "./preview";
+import { createSyntaxGuide, type SyntaxGuideHandle } from "./syntax-guide";
 
 interface PersistedState {
   font_size?: number;
@@ -39,6 +40,7 @@ const docState: DocState = {
 let editor: EditorHandle;
 let preview: PreviewHandle;
 let previewRoot: HTMLElement;
+let syntaxGuide: SyntaxGuideHandle;
 let saveStateTimer: number | undefined;
 
 function hash(s: string): number {
@@ -92,7 +94,11 @@ function updateStatus(contents: string) {
   dirtyEl.dataset.dirty = String(isDirty());
   const words = contents.trim() ? contents.trim().split(/\s+/).length : 0;
   wordsEl.textContent = `${words} ${words === 1 ? "word" : "words"}`;
-  modeEl.textContent = preview?.isOpen() ? "preview" : "";
+  modeEl.textContent = syntaxGuide?.isOpen()
+    ? "help"
+    : preview?.isOpen()
+      ? "preview"
+      : "";
 }
 
 function onDocChange(contents: string) {
@@ -184,7 +190,14 @@ async function quit() {
 }
 
 function togglePreview() {
+  if (syntaxGuide?.isOpen()) syntaxGuide.hide();
   preview.toggle(editor.getDoc());
+  updateStatus(editor.getDoc());
+}
+
+function toggleSyntaxGuide() {
+  if (preview?.isOpen()) preview.hide();
+  syntaxGuide.toggle();
   updateStatus(editor.getDoc());
 }
 
@@ -263,6 +276,12 @@ function buildMenus(): MenuDef[] {
         { label: "Reset Font Size", shortcut: "Ctrl+0", action: resetFontSize },
       ],
     },
+    {
+      label: "Help",
+      items: [
+        { label: "Syntax Guide", action: toggleSyntaxGuide },
+      ],
+    },
   ];
 }
 
@@ -308,6 +327,13 @@ function installKeybindings() {
   window.addEventListener(
     "keydown",
     (e) => {
+      if (e.key === "Escape" && syntaxGuide?.isOpen()) {
+        syntaxGuide.hide();
+        updateStatus(editor.getDoc());
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
       const mod = mac ? e.metaKey : e.ctrlKey;
       if (!mod || e.altKey) return;
       const key = e.key.toLowerCase();
@@ -395,6 +421,11 @@ async function boot() {
 
   editor = createEditor(editorRoot, "", onDocChange);
   preview = createPreview(previewRoot, () => editor.view.focus());
+  const syntaxGuideRoot = document.getElementById("syntax-guide-root")!;
+  syntaxGuide = createSyntaxGuide(syntaxGuideRoot, () => {
+    editor.view.focus();
+    updateStatus(editor.getDoc());
+  });
 
   installTitlebar();
   const menuContainer = document.getElementById("menu-bar");

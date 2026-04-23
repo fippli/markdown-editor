@@ -70,7 +70,7 @@ function getMermaid() {
   return mermaidPromise;
 }
 
-async function renderMermaidBlocks(root: HTMLElement) {
+export async function renderMermaidBlocks(root: HTMLElement) {
   const nodes = root.querySelectorAll<HTMLElement>(".mermaid");
   if (nodes.length === 0) return;
   try {

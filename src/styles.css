@@ -279,7 +279,7 @@ body {
   flex-direction: column;
 }
 
-#preview-root {
+.md-pane {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -296,7 +296,11 @@ body {
 }
 
 body[data-mode="edit"] #preview-root,
-body[data-mode="preview"] #editor-root {
+body[data-mode="edit"] #syntax-guide-root,
+body[data-mode="preview"] #editor-root,
+body[data-mode="preview"] #syntax-guide-root,
+body[data-mode="syntax-guide"] #editor-root,
+body[data-mode="syntax-guide"] #preview-root {
   display: none;
 }
 
@@ -304,7 +308,7 @@ body[data-mode="preview"] #editor-root {
   --fm-preview-column: 68ch;
 }
 
-#preview-root :is(h1, h2, h3, h4, h5, h6) {
+.md-pane :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--fm-heading);
   font-weight: 700;
   line-height: 1.2;
@@ -312,66 +316,66 @@ body[data-mode="preview"] #editor-root {
   margin: 1.6em 0 0.6em;
   color: var(--fm-text);
 }
-#preview-root > :is(h1, h2, h3, h4, h5, h6):first-child {
+.md-pane > :is(h1, h2, h3, h4, h5, h6):first-child {
   margin-top: 0;
 }
-#preview-root h1 { font-size: 1.75em; letter-spacing: -0.01em; }
-#preview-root h2 { font-size: 1.4em; }
-#preview-root h3 { font-size: 1.2em; }
-#preview-root h4 { font-size: 1.05em; }
-#preview-root h5 { font-size: 1em; text-transform: uppercase; letter-spacing: 0.06em; }
-#preview-root h6 { font-size: 0.95em; color: var(--fm-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.md-pane h1 { font-size: 1.75em; letter-spacing: -0.01em; }
+.md-pane h2 { font-size: 1.4em; }
+.md-pane h3 { font-size: 1.2em; }
+.md-pane h4 { font-size: 1.05em; }
+.md-pane h5 { font-size: 1em; text-transform: uppercase; letter-spacing: 0.06em; }
+.md-pane h6 { font-size: 0.95em; color: var(--fm-muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
-#preview-root p {
+.md-pane p {
   margin: 0 0 1em;
 }
 
-#preview-root :is(em, i) { font-style: italic; }
-#preview-root :is(strong, b) { font-weight: 700; }
-#preview-root del, #preview-root s { color: var(--fm-muted); }
+.md-pane :is(em, i) { font-style: italic; }
+.md-pane :is(strong, b) { font-weight: 700; }
+.md-pane del, .md-pane s { color: var(--fm-muted); }
 
-#preview-root a {
+.md-pane a {
   color: var(--fm-accent);
   text-decoration: none;
   border-bottom: 1px solid var(--fm-selection);
   transition: border-color 120ms ease;
 }
-#preview-root a:hover {
+.md-pane a:hover {
   border-bottom-color: var(--fm-accent);
 }
 
-#preview-root :is(ul, ol) {
+.md-pane :is(ul, ol) {
   margin: 0 0 1em;
   padding-left: 1.5em;
 }
-#preview-root li {
+.md-pane li {
   margin: 0.25em 0;
 }
-#preview-root li > :is(ul, ol) {
+.md-pane li > :is(ul, ol) {
   margin: 0.25em 0;
 }
-#preview-root li.task-list-item {
+.md-pane li.task-list-item {
   list-style: none;
   margin-left: -1.2em;
 }
-#preview-root li.task-list-item input[type="checkbox"] {
+.md-pane li.task-list-item input[type="checkbox"] {
   margin-right: 0.4em;
   accent-color: var(--fm-accent);
   transform: translateY(1px);
 }
 
-#preview-root blockquote {
+.md-pane blockquote {
   margin: 0 0 1em;
   padding: 0.1em 1em;
   border-left: 2px solid var(--fm-accent);
   color: var(--fm-muted);
   font-style: italic;
 }
-#preview-root blockquote p {
+.md-pane blockquote p {
   margin: 0.5em 0;
 }
 
-#preview-root hr {
+.md-pane hr {
   border: 0;
   text-align: center;
   margin: 2em auto;
@@ -382,19 +386,19 @@ body[data-mode="preview"] #editor-root {
   opacity: 0.55;
 }
 
-#preview-root :is(code, pre) {
+.md-pane :is(code, pre) {
   font-family: var(--fm-mono);
   font-feature-settings: "calt" 1, "liga" 1;
 }
 
-#preview-root :not(pre) > code {
+.md-pane :not(pre) > code {
   font-size: 0.9em;
   background: var(--fm-rule);
   padding: 0.1em 0.35em;
   border-radius: 3px;
 }
 
-#preview-root pre {
+.md-pane pre {
   margin: 0 0 1em;
   padding: 0.9em 1em;
   background: var(--fm-rule);
@@ -404,13 +408,13 @@ body[data-mode="preview"] #editor-root {
   line-height: 1.55;
 }
 
-#preview-root pre code {
+.md-pane pre code {
   background: transparent;
   padding: 0;
   font-size: inherit;
 }
 
-#preview-root .mermaid {
+.md-pane .mermaid {
   margin: 1.5em 0;
   text-align: center;
   min-height: 0;
@@ -419,33 +423,33 @@ body[data-mode="preview"] #editor-root {
   color: var(--fm-muted);
 }
 
-#preview-root .mermaid[data-processed="true"] {
+.md-pane .mermaid[data-processed="true"] {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
 }
 
-#preview-root .mermaid svg {
+.md-pane .mermaid svg {
   max-width: 100%;
   height: auto;
   display: inline-block;
 }
 
-#preview-root .math-block {
+.md-pane .math-block {
   margin: 1.5em 0;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-#preview-root .math-block .katex-display {
+.md-pane .math-block .katex-display {
   margin: 0;
 }
 
-#preview-root .math-inline .katex {
+.md-pane .math-inline .katex {
   font-size: 1em;
 }
 
-#preview-root .math-error {
+.md-pane .math-error {
   font-family: var(--fm-mono);
   color: var(--fm-accent);
   background: var(--fm-rule);
@@ -454,12 +458,12 @@ body[data-mode="preview"] #editor-root {
   white-space: pre;
 }
 
-#preview-root div.math-error {
+.md-pane div.math-error {
   padding: 0.6em 0.8em;
   margin: 1em 0;
 }
 
-#preview-root .front-matter {
+.md-pane .front-matter {
   color: var(--fm-muted);
   font-size: 0.8em;
   background: transparent;
@@ -469,34 +473,34 @@ body[data-mode="preview"] #editor-root {
   margin-bottom: 2em;
 }
 
-#preview-root table {
+.md-pane table {
   border-collapse: collapse;
   margin: 0 0 1em;
   width: 100%;
   font-size: 0.95em;
 }
-#preview-root thead th {
+.md-pane thead th {
   text-align: left;
   font-weight: 700;
   border-bottom: 1px solid var(--fm-text);
   padding: 0.45em 0.8em;
 }
-#preview-root tbody td {
+.md-pane tbody td {
   padding: 0.4em 0.8em;
   border-bottom: 1px solid var(--fm-rule);
 }
-#preview-root table tr:last-child td {
+.md-pane table tr:last-child td {
   border-bottom: none;
 }
 
-#preview-root img {
+.md-pane img {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 1em auto;
 }
 
-#preview-root kbd {
+.md-pane kbd {
   font-family: var(--fm-mono);
   font-size: 0.85em;
   background: var(--fm-rule);
@@ -506,7 +510,7 @@ body[data-mode="preview"] #editor-root {
 }
 
 /* highlight.js theme — palette with two extra code-block accents */
-#preview-root pre {
+.md-pane pre {
   --hl-keyword: #6B4A7A;
   --hl-type: #4A7C9A;
   --hl-string: var(--fm-accent);
@@ -516,80 +520,80 @@ body[data-mode="preview"] #editor-root {
   --hl-operator: #30343F;
 }
 
-#preview-root .hljs-comment,
-#preview-root .hljs-quote {
+.md-pane .hljs-comment,
+.md-pane .hljs-quote {
   color: var(--hl-comment);
   font-style: italic;
 }
 
-#preview-root .hljs-keyword,
-#preview-root .hljs-selector-tag,
-#preview-root .hljs-subst {
+.md-pane .hljs-keyword,
+.md-pane .hljs-selector-tag,
+.md-pane .hljs-subst {
   color: var(--hl-keyword);
   font-weight: 700;
 }
 
-#preview-root .hljs-string,
-#preview-root .hljs-regexp,
-#preview-root .hljs-addition,
-#preview-root .hljs-char.escape_,
-#preview-root .hljs-meta .hljs-string {
+.md-pane .hljs-string,
+.md-pane .hljs-regexp,
+.md-pane .hljs-addition,
+.md-pane .hljs-char.escape_,
+.md-pane .hljs-meta .hljs-string {
   color: var(--hl-string);
 }
 
-#preview-root .hljs-number,
-#preview-root .hljs-literal {
+.md-pane .hljs-number,
+.md-pane .hljs-literal {
   color: var(--hl-number);
 }
 
-#preview-root .hljs-type,
-#preview-root .hljs-built_in,
-#preview-root .hljs-builtin-name,
-#preview-root .hljs-class .hljs-title,
-#preview-root .hljs-symbol,
-#preview-root .hljs-property {
+.md-pane .hljs-type,
+.md-pane .hljs-built_in,
+.md-pane .hljs-builtin-name,
+.md-pane .hljs-class .hljs-title,
+.md-pane .hljs-symbol,
+.md-pane .hljs-property {
   color: var(--hl-type);
 }
 
-#preview-root .hljs-title,
-#preview-root .hljs-title.function_,
-#preview-root .hljs-section,
-#preview-root .hljs-selector-id,
-#preview-root .hljs-function .hljs-title {
+.md-pane .hljs-title,
+.md-pane .hljs-title.function_,
+.md-pane .hljs-section,
+.md-pane .hljs-selector-id,
+.md-pane .hljs-function .hljs-title {
   color: var(--hl-function);
   font-weight: 700;
 }
 
-#preview-root .hljs-variable,
-#preview-root .hljs-template-variable,
-#preview-root .hljs-params,
-#preview-root .hljs-attr,
-#preview-root .hljs-attribute {
+.md-pane .hljs-variable,
+.md-pane .hljs-template-variable,
+.md-pane .hljs-params,
+.md-pane .hljs-attr,
+.md-pane .hljs-attribute {
   color: var(--fm-text);
 }
 
-#preview-root .hljs-tag,
-#preview-root .hljs-name {
+.md-pane .hljs-tag,
+.md-pane .hljs-name {
   color: var(--hl-type);
 }
 
-#preview-root .hljs-meta,
-#preview-root .hljs-meta .hljs-keyword {
+.md-pane .hljs-meta,
+.md-pane .hljs-meta .hljs-keyword {
   color: var(--hl-comment);
 }
 
-#preview-root .hljs-operator,
-#preview-root .hljs-punctuation {
+.md-pane .hljs-operator,
+.md-pane .hljs-punctuation {
   color: var(--hl-operator);
 }
 
-#preview-root .hljs-deletion {
+.md-pane .hljs-deletion {
   color: var(--fm-accent);
   text-decoration: line-through;
 }
 
-#preview-root .hljs-emphasis { font-style: italic; }
-#preview-root .hljs-strong { font-weight: 700; }
+.md-pane .hljs-emphasis { font-style: italic; }
+.md-pane .hljs-strong { font-weight: 700; }
 
 .cm-editor {
   height: 100%;
@@ -747,7 +751,8 @@ body[data-mode="preview"] #editor-root {
 
   body[data-mode="preview"] #editor-root,
   #status-line,
-  #editor-root {
+  #editor-root,
+  #syntax-guide-root {
     display: none !important;
   }
 
@@ -760,32 +765,32 @@ body[data-mode="preview"] #editor-root {
     max-width: none !important;
   }
 
-  #preview-root {
+  .md-pane {
     font-size: 11pt;
     line-height: 1.55;
     color: #000;
   }
 
-  #preview-root :is(h1, h2, h3, h4, h5, h6) {
+  .md-pane :is(h1, h2, h3, h4, h5, h6) {
     break-after: avoid-page;
     page-break-after: avoid;
   }
 
-  #preview-root pre,
-  #preview-root blockquote,
-  #preview-root table,
-  #preview-root .mermaid,
-  #preview-root .math-block {
+  .md-pane pre,
+  .md-pane blockquote,
+  .md-pane table,
+  .md-pane .mermaid,
+  .md-pane .math-block {
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  #preview-root a {
+  .md-pane a {
     color: #000;
     border-bottom: none;
   }
 
-  #preview-root pre {
+  .md-pane pre {
     background: #f5f5f5;
     border: 1px solid #e0e0e0;
   }
