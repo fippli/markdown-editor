@@ -5,6 +5,7 @@ description = "A beautiful markdown editor for Linux"
 authors = ["Filip"]
 edition = "2021"
 rust-version = "1.77"
+license = "MIT"
 
 [lib]
 name = "fippli_markdown_lib"
