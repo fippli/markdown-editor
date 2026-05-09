@@ -90,11 +90,10 @@ function updateTitle() {
 function updateStatus(contents: string) {
   const name = docState.path ? basename(docState.path) : UNTITLED_NAME;
   const nameEl = document.getElementById("status-name")!;
-  const dirtyEl = document.getElementById("status-dirty")!;
   const wordsEl = document.getElementById("status-words")!;
   const modeEl = document.getElementById("status-mode")!;
   nameEl.textContent = name;
-  dirtyEl.dataset.dirty = String(isDirty());
+  document.body.dataset.dirty = String(isDirty());
   const words = contents.trim() ? contents.trim().split(/\s+/).length : 0;
   wordsEl.textContent = `${words} ${words === 1 ? "word" : "words"}`;
   modeEl.textContent = syntaxGuide?.isOpen()
@@ -292,7 +291,6 @@ function initChrome() {
     ],
     showStatusLine: true,
   });
-  chrome.viewport.id = "app"; // existing styles target #app
 
   for (const id of ["editor-root", "preview-root", "syntax-guide-root"]) {
     const sec = document.createElement("section");
@@ -304,13 +302,21 @@ function initChrome() {
     chrome.viewport.appendChild(sec);
   }
 
-  const sl = chrome.statusLine!;
-  for (const id of ["status-name", "status-dirty", "status-mode", "status-words"]) {
-    const span = document.createElement("span");
-    span.id = id;
-    if (id === "status-dirty") span.setAttribute("aria-hidden", "true");
-    sl.appendChild(span);
-  }
+  // Status line:
+  //   LEFT (info)  → filename
+  //   RIGHT (state) → mode badge + word count
+  // Dirty rides body[data-dirty="true"].
+  const nameSpan = document.createElement("span");
+  nameSpan.id = "status-name";
+  chrome.statusInfo!.appendChild(nameSpan);
+
+  const modeSpan = document.createElement("span");
+  modeSpan.id = "status-mode";
+  chrome.statusState!.appendChild(modeSpan);
+
+  const wordsSpan = document.createElement("span");
+  wordsSpan.id = "status-words";
+  chrome.statusState!.appendChild(wordsSpan);
 }
 
 async function runExportHtml() {

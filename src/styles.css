@@ -106,16 +106,12 @@ html, body {
   overscroll-behavior: none;
 }
 
+/* Body grid (titlebar / main / status) is owned by the package. */
 body {
-  display: flex;
-  flex-direction: column;
   cursor: default;
 }
 
-
-#app {
-  flex: 1 1 auto;
-  min-height: 0;
+#viewport {
   display: flex;
   flex-direction: column;
 }
@@ -535,57 +531,33 @@ body[data-mode="syntax-guide"] #preview-root {
   font-style: italic;
 }
 
+/* Status line geometry is package-owned. App-specific bits: mono font for
+ * the whole line (matches markdown-editor's character), accent-coloured
+ * mode label, ellipsised filename. */
+
 #status-line {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 20px 8px;
-  border-top: 1px solid var(--fm-rule);
-  background: var(--fm-status-bg);
-  color: var(--fm-muted);
   font-family: var(--fm-mono);
   font-size: 12px;
   letter-spacing: 0.01em;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 #status-name {
   flex: 1 1 auto;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#status-dirty {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 120ms ease;
-}
-
-#status-dirty[data-dirty="true"] {
-  background: var(--fm-accent);
-}
-
 #status-mode {
-  flex: 0 0 auto;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.85em;
   color: var(--fm-accent);
 }
+#status-mode:empty { display: none; }
 
-#status-mode:empty {
-  display: none;
-}
-
-#status-words {
-  flex: 0 0 auto;
-  font-variant-numeric: tabular-nums;
-}
+#status-words { font-variant-numeric: tabular-nums; }
 
 @media print {
   @page {
@@ -605,7 +577,7 @@ body[data-mode="syntax-guide"] #preview-root {
     display: none !important;
   }
 
-  #app, #preview-root {
+  #viewport, #preview-root {
     display: block !important;
     overflow: visible !important;
     height: auto !important;
