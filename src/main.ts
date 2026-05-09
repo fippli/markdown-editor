@@ -2,7 +2,7 @@ import "@krill-software/desktop-ui/styles";
 import "./styles.css";
 import "katex/dist/katex.min.css";
 
-import { mountChrome, type MenuDef } from "@krill-software/desktop-ui";
+import { mountChrome } from "@krill-software/desktop-ui";
 
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow, LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
@@ -229,64 +229,18 @@ function installMarginClickToggle() {
   );
 }
 
-function buildMenus(): MenuDef[] {
-  const withFocus = (cmd: (view: any) => boolean) => {
-    const view = editor.view;
-    cmd(view);
-    view.focus();
-  };
-  const clipboard = (command: "cut" | "copy" | "paste") => {
-    editor.view.focus();
-    document.execCommand(command);
-  };
-  return [
-    {
-      label: "File",
-      items: [
-        { label: "New", shortcut: "Ctrl+N", action: () => void newFile() },
-        { label: "Open…", shortcut: "Ctrl+O", action: () => void openViaDialog() },
-        { sep: true },
-        { label: "Save", shortcut: "Ctrl+S", action: () => void save() },
-        { label: "Save As…", shortcut: "Ctrl+Shift+S", action: () => void saveAs() },
-        { sep: true },
-        { label: "Export to HTML…", shortcut: "Ctrl+Shift+H", action: () => void runExportHtml() },
-        { label: "Export to PDF…", shortcut: "Ctrl+Shift+P", action: () => void runExportPdf() },
-        { sep: true },
-        { label: "Quit", shortcut: "Ctrl+Q", action: () => void quit() },
-      ],
-    },
-    {
-      label: "Edit",
-      items: [
-        { label: "Undo", shortcut: "Ctrl+Z", action: () => withFocus(undo) },
-        { label: "Redo", shortcut: "Ctrl+Shift+Z", action: () => withFocus(redo) },
-        { sep: true },
-        { label: "Cut", shortcut: "Ctrl+X", action: () => clipboard("cut") },
-        { label: "Copy", shortcut: "Ctrl+C", action: () => clipboard("copy") },
-        { label: "Paste", shortcut: "Ctrl+V", action: () => clipboard("paste") },
-        { sep: true },
-        { label: "Select All", shortcut: "Ctrl+A", action: () => withFocus(selectAll) },
-      ],
-    },
-    {
-      label: "View",
-      items: [
-        { label: "Preview", shortcut: "Ctrl+E", action: togglePreview },
-        { label: "Focus Mode", shortcut: "Ctrl+Shift+F", action: toggleFocus },
-        { sep: true },
-        { label: "Increase Font Size", shortcut: "Ctrl+=", action: () => bumpFontSize(1) },
-        { label: "Decrease Font Size", shortcut: "Ctrl+-", action: () => bumpFontSize(-1) },
-        { label: "Reset Font Size", shortcut: "Ctrl+0", action: resetFontSize },
-      ],
-    },
-    {
-      label: "Help",
-      items: [
-        { label: "Syntax Guide", action: toggleSyntaxGuide },
-      ],
-    },
-  ];
-}
+// Menus + shortcuts come from desktop-ui's action registry. App-specific
+// items (Export, Preview / Focus / Font-size, Syntax Guide) layer on via
+// customMenu — Quit's callback is overridden so we can confirm-if-dirty.
+const withFocus = (cmd: (view: any) => boolean) => {
+  const view = editor.view;
+  cmd(view);
+  view.focus();
+};
+const clipboard = (command: "cut" | "copy" | "paste") => {
+  editor.view.focus();
+  document.execCommand(command);
+};
 
 /** Build the body chrome via desktop-ui's mountChrome, then graft the
  *  app's three working-view roots (editor / preview / syntax-guide) and
@@ -294,7 +248,48 @@ function buildMenus(): MenuDef[] {
 function initChrome() {
   const chrome = mountChrome({
     productName: "Markdown Editor",
-    menus: buildMenus(),
+    actions: {
+      "new":        () => void newFile(),
+      "open":       () => void openViaDialog(),
+      "save":       () => void save(),
+      "save-as":    () => void saveAs(),
+      "quit":       () => void quit(),
+      "undo":       () => withFocus(undo),
+      "redo":       () => withFocus(redo),
+      "cut":        () => clipboard("cut"),
+      "copy":       () => clipboard("copy"),
+      "paste":      () => clipboard("paste"),
+      "select-all": () => withFocus(selectAll),
+    },
+    customMenu: [
+      {
+        group: "file",
+        items: [
+          { label: "Export to HTML…", shortcut: "Ctrl+Shift+H", action: () => void runExportHtml() },
+          { label: "Export to PDF…",  shortcut: "Ctrl+Shift+P", action: () => void runExportPdf() },
+        ],
+      },
+      {
+        group: "view",
+        items: [
+          { label: "Preview",        shortcut: "Ctrl+E",       action: togglePreview },
+          { label: "Focus mode",     shortcut: "Ctrl+Shift+F", action: toggleFocus },
+          { sep: true },
+          // App-specific use of the Ctrl+= / Ctrl+- / Ctrl+0 shortcuts:
+          // markdown-editor doesn't zoom, but it does scale the editor's
+          // own font-size, which is the "make text bigger" expectation.
+          { label: "Increase font size", shortcut: "Ctrl+=", action: () => bumpFontSize(1) },
+          { label: "Decrease font size", shortcut: "Ctrl+-", action: () => bumpFontSize(-1) },
+          { label: "Reset font size",    shortcut: "Ctrl+0", action: resetFontSize },
+        ],
+      },
+      {
+        group: "help",
+        items: [
+          { label: "Syntax guide", action: toggleSyntaxGuide },
+        ],
+      },
+    ],
     showStatusLine: true,
   });
   chrome.viewport.id = "app"; // existing styles target #app
@@ -334,43 +329,17 @@ async function runExportPdf() {
   }
 }
 
-function installKeybindings() {
-  const mac = navigator.platform.toLowerCase().includes("mac");
-  window.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key === "Escape" && syntaxGuide?.isOpen()) {
-        syntaxGuide.hide();
-        updateStatus(editor.getDoc());
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return;
-      }
-      const mod = mac ? e.metaKey : e.ctrlKey;
-      if (!mod || e.altKey) return;
-      const key = e.key.toLowerCase();
-      const shift = e.shiftKey;
-      let handled = true;
-      if (key === "s" && !shift) void save();
-      else if (key === "s" && shift) void saveAs();
-      else if (key === "o" && !shift) void openViaDialog();
-      else if (key === "n" && !shift) void newFile();
-      else if (key === "q" && !shift) void quit();
-      else if (key === "e" && !shift) togglePreview();
-      else if (key === "f" && shift) toggleFocus();
-      else if (key === "h" && shift) void runExportHtml();
-      else if (key === "p" && shift) void runExportPdf();
-      else if (key === "=" || key === "+") bumpFontSize(1);
-      else if (key === "-") bumpFontSize(-1);
-      else if (key === "0") resetFontSize();
-      else handled = false;
-      if (handled) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-    },
-    { capture: true },
-  );
+// Esc dismisses the syntax-guide overlay — the only app-specific
+// keybinding the canonical action registry can't cover.
+function installEscapeHandler() {
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && syntaxGuide?.isOpen()) {
+      syntaxGuide.hide();
+      updateStatus(editor.getDoc());
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }, { capture: true });
 }
 
 function schedulePersist() {
@@ -442,7 +411,7 @@ async function boot() {
   });
 
   installMarginClickToggle();
-  installKeybindings();
+  installEscapeHandler();
   await installWindowPersistence();
 
   let openedFromArg = false;
