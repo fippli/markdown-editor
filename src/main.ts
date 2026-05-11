@@ -2,7 +2,7 @@ import "@krill-software/desktop-ui/styles";
 import "./styles.css";
 import "katex/dist/katex.min.css";
 
-import { mountChrome } from "@krill-software/desktop-ui";
+import { mountChrome, showBootError } from "@krill-software/desktop-ui";
 
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow, LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
@@ -451,4 +451,5 @@ async function boot() {
 
 boot().catch((e) => {
   console.error("boot failed:", e);
+  showBootError(e);
 });
