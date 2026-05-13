@@ -11,5 +11,6 @@ jobs:
     with:
       product-name: "Markdown Editor"
       example-file: "test.md"
+    secrets: inherit
     permissions:
       contents: write
