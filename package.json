@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "release": "bash scripts/publish.sh",
+    "release:repackage": "bash scripts/publish.sh --skip-build"
   },
   "dependencies": {
     "@codemirror/commands": "^6.6.0",

@@ -533,20 +533,12 @@ body[data-mode="syntax-guide"] #preview-root {
 
 /* Status line geometry is package-owned. App-specific bits: mono font for
  * the whole line (matches markdown-editor's character), accent-coloured
- * mode label, ellipsised filename. */
+ * mode label. */
 
 #status-line {
   font-family: var(--fm-mono);
   font-size: 12px;
   letter-spacing: 0.01em;
-}
-
-#status-name {
-  flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 #status-mode {
